@@ -1,0 +1,36 @@
+{
+  "name": "express-student-management-api",
+  "version": "1.0.0",
+  "description": "RESTful backend system for managing students, subjects, grades, and user authentication",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js",
+    "test": "jest --coverage",
+    "test:watch": "jest --watchAll",
+    "seed": "node seed.js"
+  },
+  "keywords": [
+    "express",
+    "mongodb",
+    "student-management",
+    "rest-api"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2",
+    "mongoose": "^7.6.3",
+    "dotenv": "^16.3.1",
+    "cors": "^2.8.5",
+    "jsonwebtoken": "^9.0.2",
+    "bcrypt": "^5.1.1"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "supertest": "^6.3.3",
+    "fast-check": "^3.13.2",
+    "mongodb-memory-server": "^9.0.1",
+    "nodemon": "^3.0.1"
+  }
+}
