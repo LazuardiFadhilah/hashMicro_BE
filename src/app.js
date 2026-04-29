@@ -40,8 +40,31 @@ app.use((err, req, res, next) => {
 
 const PORT = process.env.PORT || 5001;
 
-// Only start the server if we're not in a test environment
-if (process.env.NODE_ENV !== 'test') {
+// Connect to database for Vercel serverless
+let isConnected = false;
+
+const connectToDatabase = async () => {
+  if (isConnected) {
+    return;
+  }
+  
+  try {
+    await connectDB();
+    isConnected = true;
+  } catch (err) {
+    console.error('Failed to connect to database:', err.message);
+    throw err;
+  }
+};
+
+// Vercel serverless handler
+const handler = async (req, res) => {
+  await connectToDatabase();
+  return app(req, res);
+};
+
+// Only start the server if we're not in a test environment or Vercel
+if (process.env.NODE_ENV !== 'test' && !process.env.VERCEL) {
   connectDB().then(() => {
     app.listen(PORT, () => {
       console.log(`Server is running on port ${PORT}`);
@@ -52,4 +75,4 @@ if (process.env.NODE_ENV !== 'test') {
   });
 }
 
-module.exports = app;
+module.exports = handler;
