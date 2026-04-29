@@ -77,6 +77,18 @@ Data yang akan dibuat:
 
 ---
 
+## npm Scripts
+
+| Script | Command | Description |
+|--------|---------|-------------|
+| `npm start` | `node src/app.js` | Run in production mode |
+| `npm run dev` | `nodemon src/app.js` | Run in development mode (auto-restart) |
+| `npm test` | `jest --coverage` | Run all tests with coverage report |
+| `npm run test:watch` | `jest --watchAll` | Run tests in watch mode |
+| `npm run seed` | `node seed.js` | Seed database with sample data |
+
+---
+
 ## Testing
 
 ```bash
@@ -86,6 +98,47 @@ npm test
 # Mode watch (auto-rerun saat file berubah)
 npm run test:watch
 ```
+
+### Testing Approach
+
+The project uses a three-layer testing strategy:
+
+#### Unit Tests (Jest)
+Unit tests validate individual functions and controllers in isolation. They cover:
+- **Authentication controller** — registration, login, duplicate email handling
+- **Student controller** — CRUD operations, pagination, soft delete
+- **Subject controller** — CRUD operations, duplicate code handling
+- **Grade controller** — score/attendance range validation, referential integrity
+- **Checker controller** — case-sensitive and case-insensitive character matching
+- **Auth middleware** — JWT verification, missing/invalid token handling
+
+#### Integration Tests (Supertest + mongodb-memory-server)
+Integration tests validate end-to-end flows using an in-memory MongoDB instance:
+- Full authentication flow: register → login → access protected endpoint
+- Grade report generation with complex business logic calculations
+- Database operations with referential integrity enforcement
+- Middleware configuration (CORS, JSON parsing, error handling)
+
+#### Property-Based Tests (fast-check)
+Property-based tests verify universal correctness properties across many randomly generated inputs. 15 properties are tested:
+
+| # | Property | Validates |
+|---|----------|-----------|
+| 1 | Password hashing with bcrypt | Hash differs from original; bcrypt.compare returns true |
+| 2 | Email format validation | Validation passes only for valid email formats |
+| 3 | Soft delete operation preservation | isDeleted=true; all other fields unchanged |
+| 4 | Soft delete query filtering | Queries automatically exclude isDeleted=true records |
+| 5 | Age validation | Passes only for positive numbers (> 0) |
+| 6 | Score and attendance range validation | Passes only for values 0–100 inclusive |
+| 7 | Grade letter calculation | A(≥90), B(≥75), C(≥60), D(≥50), E(<50) |
+| 8 | Attendance bonus application | +5 bonus when attendance ≥ 80, capped at 100 |
+| 9 | Average score calculation | Average = sum / count |
+| 10 | Pass rate calculation | Pass rate = (count ≥ 60) / total × 100 |
+| 11 | Pass/fail status determination | "pass" when average ≥ 60, "fail" otherwise |
+| 12 | Unique character extraction | Unique count = size of distinct character set |
+| 13 | Case-sensitive character matching | Exact case matching for type="sensitive" |
+| 14 | Case-insensitive character matching | Lowercase matching for type="insensitive" |
+| 15 | Percentage calculation with rounding | (matched/total)×100 rounded to 2 decimal places |
 
 ---
 
