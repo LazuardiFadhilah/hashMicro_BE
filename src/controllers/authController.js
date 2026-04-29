@@ -32,6 +32,7 @@ const generateToken = (user) => {
   const payload = {
     userId: user._id,
     email: user.email,
+    name: user.name, // Add name to JWT payload
   };
   
   // Generate token with 24-hour expiration
